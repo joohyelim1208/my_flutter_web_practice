@@ -1,0 +1,34 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.10.7' # pubspec.yaml의 sdk 버전에 맞춤
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: todo_app
+
+      - name: Build Web
+        run: flutter build web --base-href "/my_flutter_web_practice/"
+        working-directory: todo_app
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./todo_app/build/web
